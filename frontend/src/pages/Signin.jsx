@@ -1,15 +1,33 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom';
 import Google from './Google.jsx'
+import {gapi} from 'gapi-script'
+
 
 export default function Signin() {
+
+  const client_id = "575460440395-adutdk1qctesgfj7h4c9eca0t41vb8m5.apps.googleusercontent.com";
 
   const [formData , setFormData] = useState({});
   const [loading , setLoading] = useState(false);
   const [error , setError] = useState(null);
 
   const navigate = useNavigate();
+
+
+  useEffect(()=>{
+    function start() {
+      gapi.client.init({
+        clientId : client_id,
+        scope : ""
+      })
+    };
+
+    gapi.load('client:auth2' , start);
+  });
+
+  
 
   const handleChange = (e)=>{
       setFormData({

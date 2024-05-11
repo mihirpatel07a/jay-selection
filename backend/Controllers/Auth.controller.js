@@ -58,6 +58,7 @@ export const Signup = async (req, res, next) => {
             });
         }
 
+    
         const hashpassword = bcrypt.hashSync(password , 10);
 
         const newuser = new User({ email, username, password : hashpassword });
@@ -81,6 +82,50 @@ export const Signup = async (req, res, next) => {
     }
 
 }
+
+
+
+export const google = async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.body.email });
+
+        if (user) {
+            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+            res.cookie("access_token", token, { httpOnly: true }).status(200).json({
+                success: true,
+                message: "successfully signed in",
+            
+            });
+        } else {
+            // Generate a secure random password
+            const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+
+            const newUser = new User({
+                username: req.body.username,
+                email: req.body.email,
+                password: hashedPassword,
+                avatar: req.body.avatar
+            });
+
+            await newUser.save();
+
+            const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+            res.cookie("access_token", token, { httpOnly: true }).status(200).json({
+                success: true,
+                message: "successfully signed in",
+                
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "An error occurred during sign-in"
+        });
+    }
+}
+
 
 
 

@@ -1,30 +1,64 @@
-import React from "react";
+import React, { useState } from "react";
+import { GoogleLogin } from 'react-google-login';
+import { useNavigate } from "react-router-dom";
 
 export default function Google() {
 
+  const navigate = useNavigate();
+  const client_id = "575460440395-adutdk1qctesgfj7h4c9eca0t41vb8m5.apps.googleusercontent.com";
 
-    const handleClick = ()=>{
-        
+  const [error, setError] = useState(null);
+
+  const onSuccess = async (res) => {
+    console.log("Login success! Current User:");
+
+    const name = res.profileObj.name;
+    const email = res.profileObj.email;
+    const url = res.profileObj.imageUrl;
+
+    const formdata = {
+      username: name,
+      email: email,
+      avatar: url,
+    };
+
+    try {
+      const response = await fetch('/api/auth/google', {
+        method: "POST",
+        headers: {
+          "Content-Type": 'application/json',
+        },
+        body: JSON.stringify(formdata)
+      });
+
+      const data = await response.json();
+
+      if (data.success === false) {
+        setError(data.message);
+      } else {
+        navigate('/home');
+      }
+    } catch (error) {
+      console.error("Error during Google sign-in:", error);
+      setError("An error occurred during sign-in");
     }
+  }
+
+  const onFailure = (res) => {
+    console.log("Login failed!", res);
+    setError("Google sign-in failed");
+  }
+
   return (
     <div>
-      <button
-        onClick={handleClick}
-        type="button"
-        className="relative inline-flex w-full items-center justify-center rounded-md border border-gray-400 bg-white px-3.5 py-2.5 font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-black focus:bg-gray-100 focus:text-black focus:outline-none"
-      >
-        <span className="mr-2 inline-block">
-          <svg
-            className="h-6 w-6 text-rose-500"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <path d="M20.283 10.356h-8.327v3.451h4.792c-.446 2.193-2.313 3.453-4.792 3.453a5.27 5.27 0 0 1-5.279-5.28 5.27 5.27 0 0 1 5.279-5.279c1.259 0 2.397.447 3.29 1.178l2.6-2.599c-1.584-1.381-3.615-2.233-5.89-2.233a8.908 8.908 0 0 0-8.934 8.934 8.907 8.907 0 0 0 8.934 8.934c4.467 0 8.529-3.249 8.529-8.934 0-.528-.081-1.097-.202-1.625z"></path>
-          </svg>
-        </span>
-        Sign in with Google
-      </button>
+      <GoogleLogin
+        clientId={client_id}
+        buttonText="Sign in with Google"
+        onSuccess={onSuccess}
+        onFailure={onFailure}
+        cookiePolicy={"single_host_origin"}
+      />
+      {error && <p className="text-red-700 mt-5">{error}</p>}
     </div>
   );
 }

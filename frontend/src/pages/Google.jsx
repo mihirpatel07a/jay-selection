@@ -1,13 +1,18 @@
 import React, { useState } from "react";
 import { GoogleLogin } from 'react-google-login';
 import { useNavigate } from "react-router-dom";
+import { signInStart , signInSuccess , signInFailure } from "../redux/user/userSlice";
+
+import { useDispatch, useSelector } from "react-redux";
 
 export default function Google() {
 
   const navigate = useNavigate();
   const client_id = "575460440395-adutdk1qctesgfj7h4c9eca0t41vb8m5.apps.googleusercontent.com";
 
-  const [error, setError] = useState(null);
+  const {error} = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
 
   const onSuccess = async (res) => {
     console.log("Login success! Current User:");
@@ -23,6 +28,9 @@ export default function Google() {
     };
 
     try {
+
+      dispatch(signInStart());
+      
       const response = await fetch('/api/auth/google', {
         method: "POST",
         headers: {
@@ -34,13 +42,16 @@ export default function Google() {
       const data = await response.json();
 
       if (data.success === false) {
-        setError(data.message);
+        
+        dispatch(signInFailure(data.message));
       } else {
+
+        dispatch(signInSuccess(data));
         navigate('/home');
       }
     } catch (error) {
-      console.error("Error during Google sign-in:", error);
-      setError("An error occurred during sign-in");
+     
+       dispatch(signInFailure(error.message));
     }
   }
 

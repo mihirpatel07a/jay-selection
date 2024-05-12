@@ -27,11 +27,7 @@ export const Signin = async (req, res, next) => {
 
         const { password : pass , ...rest } = user._doc;
 
-        res.cookie("access_token" , token , {httpOnly : true}).status(200).json({
-            success : true , 
-            message : "successfully signed in" , 
-            data : rest
-        })
+        res.cookie("access_token" , token , {httpOnly : true}).status(200).json(rest);
     }
     catch(err)
     {
@@ -91,10 +87,12 @@ export const google = async (req, res) => {
 
         if (user) {
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+            const { password , ...rest} = user._doc;
+
             res.cookie("access_token", token, { httpOnly: true }).status(200).json({
                 success: true,
                 message: "successfully signed in",
-            
+                data : rest
             });
         } else {
             // Generate a secure random password
@@ -111,10 +109,12 @@ export const google = async (req, res) => {
             await newUser.save();
 
             const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+            const { password , ...rest} = user._doc;
+
             res.cookie("access_token", token, { httpOnly: true }).status(200).json({
                 success: true,
                 message: "successfully signed in",
-                
+                data : rest
             });
         }
     } catch (error) {
@@ -126,7 +126,25 @@ export const google = async (req, res) => {
     }
 }
 
+export const Signout  = (req , res)=>{
+    try{
+        res.clearCookie('access-token');
 
+        res.status(200).json({
+            success: true ,
+            message : "successfully signed out"
+        })
+
+
+    }
+    catch(error)
+    {
+        res.status(401).json({
+            success : false , 
+            message : error.message
+        })
+    }
+}
 
 
 

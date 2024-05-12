@@ -3,17 +3,22 @@ import { ArrowRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom';
 import Google from './Google.jsx'
 import {gapi} from 'gapi-script'
-
+import { signInStart , signInFailure , signInSuccess } from '../redux/user/userSlice.js';
+import { useDispatch, useSelector  } from 'react-redux';
 
 export default function Signin() {
 
   const client_id = "575460440395-adutdk1qctesgfj7h4c9eca0t41vb8m5.apps.googleusercontent.com";
 
   const [formData , setFormData] = useState({});
-  const [loading , setLoading] = useState(false);
-  const [error , setError] = useState(null);
+  
+  const { loading, error } = useSelector((state) => state.user);
+
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+
 
 
   useEffect(()=>{
@@ -38,47 +43,36 @@ export default function Signin() {
 
   console.log(formData);
 
-  const handleSubmit = async(e)=>{
-    
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try{
-
-      setLoading(true);
-
-      const res = await fetch('/api/auth/signin' , {
-        method : "POST", 
-        headers :{
-          "Content-Type": "application/json",
+  
+    try {
+      dispatch(signInStart());
+  
+      const res = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        body : JSON.stringify(formData)
-      })
-
+        body: JSON.stringify(formData),
+      });
+  
       const data = await res.json();
-
-      if(data.success === false)
-        {
-
-          setLoading(false);
-          setError(data.message);
-          return ;
-        }
-else
-{
-  setLoading(false);
-  navigate('/home');
-}
-     
-
-
-    }
-    catch(error)
-    {
+  
+      if (data.success === false) {
+        dispatch(signInFailure(data.message)); // Dispatch signInFailure action
+        return;
+      } else {
+        dispatch(signInSuccess(data)); // Dispatch signInSuccess action
+        navigate('/home');
+      }
+    } catch (error) {
+      // Handle error
       setLoading(false);
       setError(error.message);
     }
-  }
-
+  };
+  
 
   return (
  

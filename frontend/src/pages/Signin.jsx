@@ -105,6 +105,7 @@ export default function Signin() {
                       placeholder="Email"
                       onChange={handleChange}
                       id='email'
+                      required
                     ></input>
                   </div>
                 </div>
@@ -130,6 +131,7 @@ export default function Signin() {
                       placeholder="Password"
                       onChange={handleChange}
                       id='password'
+                      required
                     ></input>
                   </div>
                 </div>

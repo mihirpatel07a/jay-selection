@@ -94,6 +94,7 @@ export default function Signup() {
                       placeholder="Full Name"
                       id="username"
                       onChange={handleChange}
+                      required
                     ></input>
                   </div>
                 </div>
@@ -112,6 +113,7 @@ export default function Signup() {
                       placeholder="Email"
                       id="email"
                       onChange={handleChange}
+                      required
                     ></input>
                   </div>
                 </div>
@@ -132,6 +134,7 @@ export default function Signup() {
                       placeholder="Password"
                       id="password"
                       onChange={handleChange}
+                      required
                     ></input>
                   </div>
                 </div>

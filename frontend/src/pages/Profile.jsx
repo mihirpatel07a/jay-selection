@@ -13,6 +13,7 @@ import {
 } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 
+
 export default function Profile() {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -65,6 +66,55 @@ export default function Profile() {
       console.log(error);
     }
   };
+
+  const handleDelete = async()=>{
+      
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser.data._id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+
+      dispatch(deleteUserSuccess(data));
+
+      navigate("/signin");
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  }
+
+  const handleSignout = async()=>{
+      try{
+        dispatch(signOutStart());
+
+        const res = await fetch('/api/auth/signout' , {
+          method : "GET"
+        })
+
+        const data = res.json();
+
+        if (data.success === false) {
+          dispatch(signOutFailure(data.message));
+          return;
+        }
+
+        dispatch(signOutSuccess());
+    
+        navigate("/signin");
+
+      }
+      catch(error)
+      {
+        dispatch(signOutFailure(error.message))
+      }
+  }
 
   return (
     <>
@@ -120,6 +170,11 @@ export default function Profile() {
             Update
           </button>
         </form>
+
+        <div className="flex justify-between"> 
+          <button onClick={handleSignout} className="bg-slate-700 p-3 rounded-lg mt-4 text-white">Sign Out</button>
+          <button onClick={handleDelete} className="bg-slate-700 p-3 rounded-lg mt-4 text-white">Delete Account</button>
+        </div>
       </div>
     </>
   );

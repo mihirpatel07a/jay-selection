@@ -179,6 +179,17 @@ export default function CreateItem() {
       alert("Failed to create item. Please try again.");
     }
   };
+
+  const handleRemoveImage = (index)=> {
+     
+      setFormData ( 
+        {
+          ...formData ,
+          imageUrls : formData.imageUrls.filter(( _,i) => i !== index )
+        }
+        
+        
+      )}
   
   console.log(formData);
   return (

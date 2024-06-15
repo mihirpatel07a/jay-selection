@@ -4,6 +4,7 @@ import mongoose, { mongo } from "mongoose";
 import dotenv from 'dotenv';
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
+import itemRouter from "./routes/items.route.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(cookieparser());
 
 app.use('/api/user' , userRouter);
 app.use('/api/auth' , authRouter);
+app.use('/api/item' , itemRouter);
 
 app.listen(port, ()=> {
   console.log(`server is running on ${port}`);

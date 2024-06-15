@@ -1,5 +1,5 @@
 import { trusted } from "mongoose";
-import User from "../models.js";
+import User from "../model.js/user.model.js";
 
 export const test = (req, res)=> {
     res.send("hello this is temp page");

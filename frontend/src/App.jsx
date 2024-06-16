@@ -6,6 +6,7 @@ import Signup from './pages/Signup'
 import Nav from  './pages/nav'
 import Profile from './pages/Profile'
 import CreateItem from './Adminpages/CreateItem'
+import Items from './Adminpages/Items'
 
 export default function App() {
   return (
@@ -20,6 +21,8 @@ export default function App() {
         <Route path="/profile" element={<Profile/>} ></Route>
 
         <Route path="/admin/createitem" element={<CreateItem/>} ></Route>
+        <Route path="/admin/items" element={<Items/>} ></Route>
+
         
       </Routes>
       </BrowserRouter>

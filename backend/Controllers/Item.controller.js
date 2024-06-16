@@ -13,13 +13,13 @@ export const createItem = async (req, res, next) => {
             brand: req.body.brand,
             category: req.body.category,
             gender: req.body.gender,
-            sizes: req.body.sizes, // Ensure correct field name
+            size: req.body.sizes, // Ensure correct field name
             color: req.body.color,
             price: req.body.price,
             discount: req.body.discount,
             stock_quantity: req.body.quantity, // Ensure correct field name
             availability: req.body.availability,
-            imageUrls : req.body.imageUrls 
+            imageUrls: req.body.imageUrls
         });
 
         await item.save();
@@ -40,3 +40,117 @@ export const createItem = async (req, res, next) => {
         });
     }
 };
+
+export const getAllItems = async (req, res, next) => {
+    try {
+
+        const data = await Item.find();
+
+        res.status(200).json(data);
+    }
+    catch (error) {
+        res.status(401).json({
+            success: false,
+            message: "something wrong"
+        });
+    }
+}
+
+
+
+export const deleteItem = async (req, res, next) => {
+
+    try {
+        const item = await Item.findById(req.params.id);
+
+        if (!item) {
+            res.status(404).json({
+                message: "item not found",
+                success: false
+            })
+
+            return
+
+        }
+        await Item.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({
+            success: true,
+            message: "successfully deleted"
+        })
+    }
+
+    catch (error) {
+        res.status(401).json({
+            success: false,
+            message: "something wrong"
+        });
+    }
+
+}
+
+
+export const updateItem = async (req, res, next) => {
+
+    try {
+        
+
+        const item = await Item.findById(req.params.id);
+
+        if (!item) {
+            res.status(404).json({
+                message: "item not found",
+                success: false
+            })
+
+            return
+        }
+
+        const updateditem = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+        res.status(200).json({
+            message : "successfully updated" ,
+            success : true , 
+            data : updateditem
+        })
+
+    }
+    catch(error)
+    {
+        res.status(401).json({
+            success: false,
+            message: "something wrong"
+        });
+    }
+}
+
+export const getItem = async(req , res, next)=> {
+
+    try{
+
+    
+    const item = await Item.findById(req.params.id);
+
+    if(!item)
+        {
+            res.status(404).json({
+                message : "item not found" , 
+                success : false
+            })
+
+            retrun 
+        }
+
+        res.status(200).json(item);
+    }
+
+    catch(error)
+    {
+        res.status(401).json({
+            success: false,
+            message: "something wrong"
+        });
+    }
+
+
+}

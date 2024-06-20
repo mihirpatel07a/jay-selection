@@ -9,6 +9,7 @@ import CreateItem from './Adminpages/CreateItem'
 import Items from './Adminpages/Items'
 import UpdateItem from './Adminpages/UpdateItem'
 import Users from './Adminpages/Users'
+import PagenotFound from './pages/PagenotFound'
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
       <Nav/>
       <Routes>
 
+        <Route path="/*" element={<PagenotFound/>} ></Route>
         <Route path="/home" element={<Home/>} ></Route>
         <Route path="/signin" element={<Signin/>} ></Route>
         <Route path="/signup" element={<Signup/>} ></Route>

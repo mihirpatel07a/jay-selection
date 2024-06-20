@@ -89,40 +89,42 @@ export const deleteItem = async (req, res, next) => {
 
 }
 
+ // Adjust the import based on your actual item model location
 
 export const updateItem = async (req, res, next) => {
-
     try {
-        
-
         const item = await Item.findById(req.params.id);
 
         if (!item) {
-            res.status(404).json({
-                message: "item not found",
-                success: false
-            })
-
-            return
+            return res.status(404).json({
+                success: false,
+                message: "Item not found"
+            });
         }
 
-        const updateditem = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+        if (!updatedItem) {
+            return res.status(404).json({
+                success: false,
+                message: "Failed to update item"
+            });
+        }
 
         res.status(200).json({
-            message : "successfully updated" ,
-            success : true , 
-            data : updateditem
-        })
-
-    }
-    catch(error)
-    {
-        res.status(401).json({
+            success: true,
+            message: "Item updated successfully",
+            data: updatedItem
+        });
+    } catch (error) {
+        console.error("Error updating item:", error);
+        res.status(500).json({
             success: false,
-            message: "something wrong"
+            message: "Something went wrong"
         });
     }
-}
+};
+
 
 export const getItem = async(req , res, next)=> {
 

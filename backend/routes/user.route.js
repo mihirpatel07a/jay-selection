@@ -12,6 +12,6 @@ const router = express.Router();
 router.get('/temp' , test);
 router.delete('/delete/:id' , deleteUSer);
 router.put('/update/:id' , UpdateUser);
-router.get('/users' , getUsers);
+router.get('/getusers' , getUsers);
 
 export default router;

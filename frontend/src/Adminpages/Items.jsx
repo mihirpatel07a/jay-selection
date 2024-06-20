@@ -33,10 +33,20 @@ export default function Items() {
    
     <div className="container mx-auto mt-5">
     {/* <h1 className="font-bold text-black text-center text-4xl mb-5">Items</h1> */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ">
-        {items.map((item, index) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 justify-items-center ">
+        {items && items.map((item, index) => (
             <EcommerceCard key={index} product={item} />
         ))}
+
+
+       
+
+
+    </div>
+    <div>
+    {
+    items.length == 0 &&  <p className='text-center font-bold text-4xl mt-5'>No items Available</p>
+}
     </div>
 </div>
   )

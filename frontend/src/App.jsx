@@ -10,6 +10,9 @@ import Items from './Adminpages/Items'
 import UpdateItem from './Adminpages/UpdateItem'
 import Users from './Adminpages/Users'
 import PagenotFound from './pages/PagenotFound'
+import Ahome from './Adminpages/Ahome'
+import Products from './pages/Products'
+import AllProducts from './pages/Allproducts'
 
 export default function App() {
   return (
@@ -23,11 +26,15 @@ export default function App() {
         <Route path="/signin" element={<Signin/>} ></Route>
         <Route path="/signup" element={<Signup/>} ></Route>
         <Route path="/profile" element={<Profile/>} ></Route>
+        <Route path="/products" element={<AllProducts/>} ></Route>
+
+
 
         <Route path="/admin/createitem" element={<CreateItem/>} ></Route>
         <Route path="/admin/items" element={<Items/>} ></Route>
         <Route path="/admin/updateitem/:id" element={<UpdateItem/>} ></Route>
         <Route path="/admin/users" element={<Users/>} ></Route>
+        <Route path="/admin/home" element={<Ahome/>} ></Route>
 
         
       </Routes>

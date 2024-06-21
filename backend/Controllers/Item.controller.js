@@ -1,3 +1,4 @@
+import CartItem from "../model.js/cart.model.js";
 import Item from "../model.js/item.model.js"; // Adjust path as necessary
 
 export const createItem = async (req, res, next) => {
@@ -188,3 +189,62 @@ export const getItem = async(req , res, next)=> {
 
 
 }
+
+
+
+export const createCartData = async (req, res) => {
+    try {
+        // Input validation - You might want to implement validation here before proceeding
+
+        const { id, name, size, color, price, quantity, imageSrc ,userid , totalprice} = req.body;
+
+        // Create a new CartItem instance
+        const newItem = new CartItem({
+            id,
+            name,
+            size, // Assuming size is correctly provided in the request body
+            color,
+            price,
+            userid , 
+            quantity,
+            imageSrc,
+            totalprice
+        });
+
+        // Save the new item to the database
+        const savedItem = await newItem.save();
+
+        // Return success response with the created item
+        res.status(201).json({
+            success: true,
+            message: "Item successfully created",
+            data: savedItem
+        });
+    } catch (error) {
+        console.error("Error creating item:", error);
+
+        // Return error response
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+};
+
+export const getCartData = async(req ,res)=>{
+
+    try{
+        const data = await CartItem.find();
+
+        res.status(200).json(data);
+    }
+    catch(error)
+    {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+

@@ -1,70 +1,9 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    theme: {
-      extend: {
-        gridTemplateRows: {
-          '[auto,auto,1fr]': 'auto auto 1fr',
-        },
-      },
-    },
-    plugins: [
-      // ...
-      require('@tailwindcss/aspect-ratio'),
-    ],
-  }
-  ```
-*/
 import { useEffect, useState } from "react";
 import { StarIcon } from "@heroicons/react/20/solid";
-import { Radio, RadioGroup } from "@headlessui/react";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const product = {
-  name: "Basic Tee 6-Pack",
-  price: "$192",
-  href: "#",
-  breadcrumbs: [
-    { id: 1, name: "Men", href: "#" },
-    { id: 2, name: "Clothing", href: "#" },
-  ],
-  images: [
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-secondary-product-shot.jpg",
-      alt: "Two each of gray, white, and black shirts laying flat.",
-    },
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-tertiary-product-shot-01.jpg",
-      alt: "Model wearing plain black basic tee.",
-    },
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-tertiary-product-shot-02.jpg",
-      alt: "Model wearing plain gray basic tee.",
-    },
-    {
-      src: "https://tailwindui.com/img/ecommerce-images/product-page-02-featured-product-shot.jpg",
-      alt: "Model wearing plain white basic tee.",
-    },
-  ],
-  colors: [
-    { name: "white", class: "bg-white", selectedClass: "ring-gray-400" },
-    { name: "Gray", class: "bg-gray-200", selectedClass: "ring-gray-400" },
-    { name: "black", class: "bg-gray-900", selectedClass: "ring-gray-900" },
-  ],
-  sizes: [
-    { name: "XXS", inStock: false },
-    { name: "XS", inStock: true },
-    { name: "S", inStock: true },
-    { name: "M", inStock: true },
-    { name: "L", inStock: true },
-    { name: "XL", inStock: true },
-    { name: "2XL", inStock: true },
-    { name: "3XL", inStock: true },
-  ],
   description:
     'The Basic Tee 6-Pack allows you to fully express your vibrant personality with three grayscale options. Feeling adventurous? Put on a heather gray tee. Want to be a trendsetter? Try our exclusive colorway: "Black". Need to add an extra pop of color to your outfit? Our white tee has you covered.',
   highlights: [
@@ -73,9 +12,8 @@ const product = {
     "Pre-washed & pre-shrunk",
     "Ultra-soft 100% cotton",
   ],
-  details:
-    'The 6-Pack includes two black, two white, and two heather gray Basic Tees. Sign up for our subscription service and be the first to get new, exciting colors, like our upcoming "Charcoal Gray" limited release.',
 };
+
 const reviews = { href: "#", average: 4, totalCount: 117 };
 
 function classNames(...classes) {
@@ -83,8 +21,11 @@ function classNames(...classes) {
 }
 
 export default function Pdetails() {
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
+
+
+    const {currentUser} = useSelector((state) => state.user);
+
+    
 
   const [item, setItem] = useState({
     title: "",
@@ -102,7 +43,6 @@ export default function Pdetails() {
   });
 
   const params = useParams();
-
   const id = params.id;
 
   useEffect(() => {
@@ -138,7 +78,67 @@ export default function Pdetails() {
     getItem();
   }, [id]);
 
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+
+  const handleChange = (event) => {
+    const { id, value } = event.target;
+
+    switch (id) {
+      case "colors":
+        setSelectedColor(value);
+        break;
+      case "sizes":
+        setSelectedSize(value);
+        break;
+      default:
+        break;
+    }
+  };
+
   console.log(item);
+
+  const addToCart = async(e) => {
+
+    e.preventDefault();
+    // Here you can add logic to add the selected item (with selected color and size) to the cart
+      const cartdata = {
+
+      
+      id: id,
+      name: item.title,
+      userid : currentUser.data._id,
+      color: selectedColor || item.color[0],
+      size: selectedSize || item.size[0],
+      price: item.price,
+      quantity: 1,
+      imageSrc: item.imageUrls[0],
+      totalprice : item.price
+      }
+
+     
+    
+
+      const response = await fetch("/api/item/cartdata", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(cartdata),
+      });
+  
+      const data = await response.json();
+
+      if(data.success === false)
+        {
+            console.log(data.message);
+            return
+        }
+    
+        alert("successfully added to cart");
+        
+
+  };
 
   return (
     <div className="bg-white">
@@ -212,15 +212,16 @@ export default function Pdetails() {
               </div>
             </div>
 
-            <form className="mt-10">
+            <form  className="mt-10">
               {/* Colors */}
               <div className="flex sm:flex-row flex-col gap-3 justify-between">
                 <div className="flex gap-2 flex-wrap items-center">
                   <label className="font-semibold">Colors: </label>
                   <select
                     id="colors"
-                    //   onChange={handleChange}
+                    onChange={handleChange}
                     className="border rounded-lg p-2"
+                  
                   >
                     {item.color.map((color) => (
                       <option key={color} value={color}>
@@ -235,7 +236,7 @@ export default function Pdetails() {
                   <label className="font-semibold">Sizes: </label>
                   <select
                     id="sizes"
-                    //   onChange={handleChange}
+                    onChange={handleChange}
                     className="border rounded-lg p-2"
                   >
                     {item.size.map((size) => (
@@ -248,7 +249,8 @@ export default function Pdetails() {
               </div>
 
               <button
-                type="submit"
+                type="button"
+                onClick={addToCart}
                 className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 Add to bag
@@ -283,7 +285,7 @@ export default function Pdetails() {
             <div className="mt-10 flex gap-10 ">
               <div>
                 <h2 className="text-sm font-medium text-gray-900">
-                  Availability 
+                  Availability
                 </h2>
 
                 {item.availability ? (
@@ -294,23 +296,21 @@ export default function Pdetails() {
               </div>
 
               <div>
-                <h2 className="text-sm font-medium text-gray-900">
-                  Category 
-                </h2>
+                <h2 className="text-sm font-medium text-gray-900">Category</h2>
 
-               
-                  <p className="text-sm text-gray-600">{item.category}</p>
-              
+                <p className="text-sm text-gray-600">{item.category}</p>
               </div>
 
               <div>
-                <h2 className="text-sm font-medium text-gray-900">
-                  Brand 
-                </h2>
+                <h2 className="text-sm font-medium text-gray-900">Brand</h2>
 
-               
-                  <p className="text-sm text-gray-600">{item.brand}</p>
-             
+                <p className="text-sm text-gray-600">{item.brand}</p>
+              </div>
+
+              <div>
+                <h2 className="text-sm font-medium text-gray-900">Gender</h2>
+
+                <p className="text-sm text-gray-600">{item.gender}</p>
               </div>
             </div>
           </div>

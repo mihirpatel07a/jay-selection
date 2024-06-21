@@ -1,5 +1,5 @@
 import express from "express";
-import { createItem, deleteItem, getAllItems, getItem, updateItem } from "../Controllers/Item.controller.js";
+import { createCartData, createItem, deleteItem, getAllItems, getCartData, getItem, updateItem } from "../Controllers/Item.controller.js";
 
 const app = express();
 
@@ -10,6 +10,9 @@ router.get('/getitems' , getAllItems);
 router.delete('/deleteitem/:id' , deleteItem);
 router.put('/updateitem/:id' , updateItem);
 router.get('/getitem/:id' , getItem);
+router.post('/cartdata' , createCartData);
+router.get('/getcartdata' , getCartData);
+
 
 
 export default router;

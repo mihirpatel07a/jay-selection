@@ -41,20 +41,52 @@ export const createItem = async (req, res, next) => {
     }
 };
 
+ // Adjust the path to your Item model
+
 export const getAllItems = async (req, res, next) => {
-    try {
+  try {
+    const searchTerm = req.query.searchTerm || "";
+    const sort = req.query.sort || "createdAt";
+    const category = req.query.category || "";
+    const size = req.query.size || "";
+    const color = req.query.color || "";
+    const gender = req.query.gender || "";
+    const order = req.query.order || "desc";
 
-        const data = await Item.find();
+    let query = {};
 
-        res.status(200).json(data);
+    // Conditionally add filters based on query parameters
+    if (searchTerm) {
+      query.title = { $regex: searchTerm, $options: "i" }; // Case-insensitive search
     }
-    catch (error) {
-        res.status(401).json({
-            success: false,
-            message: "something wrong"
-        });
+    if (category) {
+      query.category = category;
     }
-}
+    if (size) {
+      query.size = size;
+    }
+    if (color) {
+      query.color = color;
+    }
+    if (gender) {
+      query.gender = gender;
+    }
+
+    // Fetch items from database based on constructed query
+    const data = await Item.find(query)
+      .sort({ [sort]: order })
+      .exec(); // Execute the query
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong while fetching items.",
+    });
+  }
+};
+
 
 
 

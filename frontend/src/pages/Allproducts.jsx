@@ -1,14 +1,15 @@
 import React, { useState , useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import Products from "./Products.jsx";
+import EcommerceCard from "../Adminpages/Ecommercecard.jsx";
 
 export default function Allproducts() {
   const [filters, setFilters] = useState({
     searchTerm: "",
-
-    sort_order: "createdAt_desc",
+    sort: "createdAt",
+    order : "desc",
     category: "",
-    size: "xs",
+    size: "",
     gender: "male",
     color: "black",
   });
@@ -43,11 +44,13 @@ export default function Allproducts() {
 
     const urlParams = new URLSearchParams();
     urlParams.set("searchTerm", filters.searchTerm);
-    urlParams.set("sort", filters.sort_order);
+    urlParams.set("sort", filters.sort);
     urlParams.set("size", filters.size);
     urlParams.set("gender", filters.gender);
     urlParams.set("color", filters.color);
     urlParams.set("category", filters.category);
+    urlParams.set("order" , filters.order);
+
 
     const searchQuery = urlParams.toString();
     navigate(`/products?${searchQuery}`);
@@ -55,32 +58,31 @@ export default function Allproducts() {
 
   const handleChange = (e) => {
     const { id, type, checked, value } = e.target;
-
-    switch (type) {
-      case "checkbox":
-        if (checked) {
-          setFilters((prevFilters) => ({
-            ...prevFilters,
-            [id]: [...prevFilters[id], value],
-          }));
-        } else {
-          setFilters((prevFilters) => ({
-            ...prevFilters,
-            [id]: prevFilters[id].filter((item) => item !== value),
-          }));
-        }
-        break;
-      case "text":
-
-      case "select-one": // For single select dropdowns
+  
+    switch (id) {
+      case "searchTerm":
+      case "category":
+        // For text inputs
         setFilters({ ...filters, [id]: value });
+        break;
+      case "sizes":
+      case "gender":
+      case "colors":
+        // For select dropdowns
+        setFilters({ ...filters, [id]: value });
+        break;
+      case "sort_order":
+        // For select dropdown with specific logic
+        const [sort, order] = value.split("_");
+        setFilters({ ...filters,  sort, order });
         break;
       default:
         break;
     }
   };
+  
 
-  // console.log(filters)
+  
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -177,10 +179,28 @@ export default function Allproducts() {
       </div>
       <div className="">
         <h1 className="text-2xl font-semibold border-b p-3 text-slate-700 mt-1">
-          Listing Results:
+          Product Results:
         </h1>
 
-        <Products />
+        <div className="container mx-auto mt-2">
+    {/* <h1 className="font-bold text-black text-center text-4xl mb-5">Items</h1> */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 justify-items-center p-3 ">
+        {items && items.map((item, index) => (
+            <Products key={index} item={item} />
+        ))}
+
+
+       
+
+
+    </div>
+    <div>
+    {
+    items.length == 0 &&  <p className='text-center font-bold text-4xl mt-5'>No items Available</p>
+}
+    </div>
+</div>
+      
       </div>
     </div>
   );

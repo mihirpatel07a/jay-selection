@@ -13,6 +13,8 @@ import PagenotFound from './pages/PagenotFound'
 import Ahome from './Adminpages/Ahome'
 import Products from './pages/Products'
 import AllProducts from './pages/Allproducts'
+import Pdetails from './pages/Pdetails'
+import Cart from './pages/Cart'
 
 export default function App() {
   return (
@@ -27,6 +29,8 @@ export default function App() {
         <Route path="/signup" element={<Signup/>} ></Route>
         <Route path="/profile" element={<Profile/>} ></Route>
         <Route path="/products" element={<AllProducts/>} ></Route>
+        <Route path="/product/:id" element={<Pdetails/>} ></Route>
+        <Route path="/cart" element={<Cart/>} ></Route>
 
 
 

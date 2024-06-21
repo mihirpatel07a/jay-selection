@@ -1,323 +1,187 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
-import { useState } from 'react'
-import {
-  Dialog,
-  DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  Transition,
-  TransitionChild,
-} from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid'
+import React, { useState , useEffect} from "react";
+import {useNavigate} from "react-router-dom";
+import Products from "./Products.jsx";
 
-const sortOptions = [
-  { name: 'Most Popular', href: '#', current: true },
-  { name: 'Best Rating', href: '#', current: false },
-  { name: 'Newest', href: '#', current: false },
-  { name: 'Price: Low to High', href: '#', current: false },
-  { name: 'Price: High to Low', href: '#', current: false },
-]
-const subCategories = [
-  { name: 'Totes', href: '#' },
-  { name: 'Backpacks', href: '#' },
-  { name: 'Travel Bags', href: '#' },
-  { name: 'Hip Bags', href: '#' },
-  { name: 'Laptop Sleeves', href: '#' },
-]
-const filters = [
-  {
-    id: 'color',
-    name: 'Color',
-    options: [
-      { value: 'white', label: 'White', checked: false },
-      { value: 'beige', label: 'Beige', checked: false },
-      { value: 'blue', label: 'Blue', checked: true },
-      { value: 'brown', label: 'Brown', checked: false },
-      { value: 'green', label: 'Green', checked: false },
-      { value: 'purple', label: 'Purple', checked: false },
-    ],
-  },
-  {
-    id: 'category',
-    name: 'Category',
-    options: [
-      { value: 'new-arrivals', label: 'New Arrivals', checked: false },
-      { value: 'sale', label: 'Sale', checked: false },
-      { value: 'travel', label: 'Travel', checked: true },
-      { value: 'organization', label: 'Organization', checked: false },
-      { value: 'accessories', label: 'Accessories', checked: false },
-    ],
-  },
-  {
-    id: 'size',
-    name: 'Size',
-    options: [
-      { value: '2l', label: '2L', checked: false },
-      { value: '6l', label: '6L', checked: false },
-      { value: '12l', label: '12L', checked: false },
-      { value: '18l', label: '18L', checked: false },
-      { value: '20l', label: '20L', checked: false },
-      { value: '40l', label: '40L', checked: true },
-    ],
-  },
-]
+export default function Allproducts() {
+  const [filters, setFilters] = useState({
+    searchTerm: "",
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
+    sort_order: "createdAt_desc",
+    category: "",
+    size: "xs",
+    gender: "male",
+    color: "black",
+  });
 
-export default function AllProducts() {
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+
+    const urlParams = new URLSearchParams(location.search);
+    const fetchItems = async () => {
+      const searchQuery = urlParams.toString();
+      const res = await fetch(`/api/item/getitems?${searchQuery}`);
+
+      const data = await res.json();
+      if (data.length > 4) setShowMore(true);
+      else setShowMore(false);
+
+      setItems(data);
+      setLoading(false);
+    };
+
+    fetchItems();
+  }, [location.search]);
+
+  console.log(items);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const urlParams = new URLSearchParams();
+    urlParams.set("searchTerm", filters.searchTerm);
+    urlParams.set("sort", filters.sort_order);
+    urlParams.set("size", filters.size);
+    urlParams.set("gender", filters.gender);
+    urlParams.set("color", filters.color);
+    urlParams.set("category", filters.category);
+
+    const searchQuery = urlParams.toString();
+    navigate(`/products?${searchQuery}`);
+  };
+
+  const handleChange = (e) => {
+    const { id, type, checked, value } = e.target;
+
+    switch (type) {
+      case "checkbox":
+        if (checked) {
+          setFilters((prevFilters) => ({
+            ...prevFilters,
+            [id]: [...prevFilters[id], value],
+          }));
+        } else {
+          setFilters((prevFilters) => ({
+            ...prevFilters,
+            [id]: prevFilters[id].filter((item) => item !== value),
+          }));
+        }
+        break;
+      case "text":
+
+      case "select-one": // For single select dropdowns
+        setFilters({ ...filters, [id]: value });
+        break;
+      default:
+        break;
+    }
+  };
+
+  // console.log(filters)
 
   return (
-    <div className="bg-white">
-      <div>
-        {/* Mobile filter dialog */}
-        <Transition show={mobileFiltersOpen}>
-          <Dialog className="relative z-40 lg:hidden" onClose={setMobileFiltersOpen}>
-            <TransitionChild
-              enter="transition-opacity ease-linear duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="transition-opacity ease-linear duration-300"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <div className="fixed inset-0 bg-black bg-opacity-25" />
-            </TransitionChild>
-
-            <div className="fixed inset-0 z-40 flex">
-              <TransitionChild
-                enter="transition ease-in-out duration-300 transform"
-                enterFrom="translate-x-full"
-                enterTo="translate-x-0"
-                leave="transition ease-in-out duration-300 transform"
-                leaveFrom="translate-x-0"
-                leaveTo="translate-x-full"
-              >
-                <DialogPanel className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl">
-                  <div className="flex items-center justify-between px-4">
-                    <h2 className="text-lg font-medium text-gray-900">Filters</h2>
-                    <button
-                      type="button"
-                      className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
-                      onClick={() => setMobileFiltersOpen(false)}
-                    >
-                      <span className="sr-only">Close menu</span>
-                      <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                    </button>
-                  </div>
-
-                  {/* Filters */}
-                  <form className="mt-4 border-t border-gray-200">
-                    <h3 className="sr-only">Categories</h3>
-                    <ul role="list" className="px-2 py-3 font-medium text-gray-900">
-                      {subCategories.map((category) => (
-                        <li key={category.name}>
-                          <a href={category.href} className="block px-2 py-3">
-                            {category.name}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {filters.map((section) => (
-                      <Disclosure as="div" key={section.id} className="border-t border-gray-200 px-4 py-6">
-                        {({ open }) => (
-                          <>
-                            <h3 className="-mx-2 -my-3 flow-root">
-                              <DisclosureButton className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                                <span className="font-medium text-gray-900">{section.name}</span>
-                                <span className="ml-6 flex items-center">
-                                  {open ? (
-                                    <MinusIcon className="h-5 w-5" aria-hidden="true" />
-                                  ) : (
-                                    <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                                  )}
-                                </span>
-                              </DisclosureButton>
-                            </h3>
-                            <DisclosurePanel className="pt-6">
-                              <div className="space-y-6">
-                                {section.options.map((option, optionIdx) => (
-                                  <div key={option.value} className="flex items-center">
-                                    <input
-                                      id={`filter-mobile-${section.id}-${optionIdx}`}
-                                      name={`${section.id}[]`}
-                                      defaultValue={option.value}
-                                      type="checkbox"
-                                      defaultChecked={option.checked}
-                                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                    />
-                                    <label
-                                      htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
-                                      className="ml-3 min-w-0 flex-1 text-gray-500"
-                                    >
-                                      {option.label}
-                                    </label>
-                                  </div>
-                                ))}
-                              </div>
-                            </DisclosurePanel>
-                          </>
-                        )}
-                      </Disclosure>
-                    ))}
-                  </form>
-                </DialogPanel>
-              </TransitionChild>
-            </div>
-          </Dialog>
-        </Transition>
-
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900">New Arrivals</h1>
-
-            <div className="flex items-center">
-              <Menu as="div" className="relative inline-block text-left">
-                <div>
-                  <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
-                    Sort
-                    <ChevronDownIcon
-                      className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                      aria-hidden="true"
-                    />
-                  </MenuButton>
-                </div>
-
-                <Transition
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
-                >
-                  <MenuItems className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <div className="py-1">
-                      {sortOptions.map((option) => (
-                        <MenuItem key={option.name}>
-                          {({ focus }) => (
-                            <a
-                              href={option.href}
-                              className={classNames(
-                                option.current ? 'font-medium text-gray-900' : 'text-gray-500',
-                                focus ? 'bg-gray-100' : '',
-                                'block px-4 py-2 text-sm',
-                              )}
-                            >
-                              {option.name}
-                            </a>
-                          )}
-                        </MenuItem>
-                      ))}
-                    </div>
-                  </MenuItems>
-                </Transition>
-              </Menu>
-
-              <button type="button" className="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
-                <span className="sr-only">View grid</span>
-                <Squares2X2Icon className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
-                onClick={() => setMobileFiltersOpen(true)}
-              >
-                <span className="sr-only">Filters</span>
-                <FunnelIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
+    <div className="flex flex-col md:flex-row">
+      <div className="p-7 border-b-2 md:border-r-2 md:min-h-screen">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div className="flex items-center gap-2">
+            <label className="whitespace-nowrap"> Search Term:</label>
+            <input
+              type="text"
+              id="searchTerm"
+              onChange={handleChange}
+              placeholder="Search..."
+              className="border rounded-lg p-3 w-full"
+            />
           </div>
 
-          <section aria-labelledby="products-heading" className="pb-24 pt-6">
-            <h2 id="products-heading" className="sr-only">
-              Products
-            </h2>
+          <div className="flex gap-2 flex-wrap items-center">
+            <label className="font-semibold">Sizes: </label>
+            <select
+              id="sizes"
+              onChange={handleChange}
+              className="border rounded-lg p-2"
+            >
+              {["xs", "s", "m", "l", "xl"].map((size) => (
+                <option key={size} value={size}>
+                  {size.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
-              {/* Filters */}
-              <form className="hidden lg:block">
-                <h3 className="sr-only">Categories</h3>
-                <ul role="list" className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
-                  {subCategories.map((category) => (
-                    <li key={category.name}>
-                      <a href={category.href}>{category.name}</a>
-                    </li>
-                  ))}
-                </ul>
+          <div className="flex gap-2 flex-wrap items-center">
+            <label className="font-semibold">Gender: </label>
+            <select
+              id="gender"
+              onChange={handleChange}
+              className="border rounded-lg p-2"
+            >
+              {["male", "female"].map((gender) => (
+                <option key={gender} value={gender}>
+                  {gender.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                {filters.map((section) => (
-                  <Disclosure as="div" key={section.id} className="border-b border-gray-200 py-6">
-                    {({ open }) => (
-                      <>
-                        <h3 className="-my-3 flow-root">
-                          <DisclosureButton className="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                            <span className="font-medium text-gray-900">{section.name}</span>
-                            <span className="ml-6 flex items-center">
-                              {open ? (
-                                <MinusIcon className="h-5 w-5" aria-hidden="true" />
-                              ) : (
-                                <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                              )}
-                            </span>
-                          </DisclosureButton>
-                        </h3>
-                        <DisclosurePanel className="pt-6">
-                          <div className="space-y-4">
-                            {section.options.map((option, optionIdx) => (
-                              <div key={option.value} className="flex items-center">
-                                <input
-                                  id={`filter-${section.id}-${optionIdx}`}
-                                  name={`${section.id}[]`}
-                                  defaultValue={option.value}
-                                  type="checkbox"
-                                  defaultChecked={option.checked}
-                                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                />
-                                <label
-                                  htmlFor={`filter-${section.id}-${optionIdx}`}
-                                  className="ml-3 text-sm text-gray-600"
-                                >
-                                  {option.label}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        </DisclosurePanel>
-                      </>
-                    )}
-                  </Disclosure>
-                ))}
-              </form>
+          <div className="flex gap-2 flex-wrap items-center">
+            <label className="font-semibold">Colors: </label>
+            <select
+              id="colors"
+              onChange={handleChange}
+              className="border rounded-lg p-2"
+            >
+              {["black", "yellow", "white", "blue"].map((color) => (
+                <option key={color} value={color}>
+                  {color.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
 
-              {/* Product grid */}
-              <div className="lg:col-span-3">{/* Your content */}</div>
-            </div>
-          </section>
-        </main>
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Sort: </label>
+            <select
+              onChange={handleChange}
+              id="sort_order"
+              defaultValue="createdAt_desc"
+              className="border rounded-lg p-2"
+            >
+              <option value="regularPrice_desc">Price High to Low</option>
+              <option value="regularPrice_asc">Price Low to High</option>
+              <option value="createdAt_desc">Latest</option>
+              <option value="createdAt_asc">Oldest</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <label className="whitespace-nowrap font-semibold">
+              Category:{" "}
+            </label>
+            <input
+              type="text"
+              id="category"
+              placeholder="Enter Category"
+              className="border rounded-lg p-2 w-full"
+              onChange={handleChange}
+            />
+          </div>
+
+          <button className="bg-slate-700 text-white rounded-lg p-2 hover:opacity-95">
+            Search
+          </button>
+        </form>
+      </div>
+      <div className="">
+        <h1 className="text-2xl font-semibold border-b p-3 text-slate-700 mt-1">
+          Listing Results:
+        </h1>
+
+        <Products />
       </div>
     </div>
-  )
+  );
 }

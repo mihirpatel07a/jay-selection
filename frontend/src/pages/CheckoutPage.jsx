@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import img from '../assets/js.jpg';
 
 const CheckoutPage = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [cartProducts, setCartProducts] = useState([]);
+  const [razorpayKey, setRazorpayKey] = useState('');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -16,6 +18,20 @@ const CheckoutPage = () => {
     cartItems: [],
     totalSum: 0
   });
+
+  useEffect(() => {
+    const fetchRazorpayKey = async () => {
+      try {
+        const res = await fetch('/api/payment/key');
+        const data = await res.json();
+        setRazorpayKey(data.key);
+      } catch (error) {
+        console.error('Error fetching Razorpay key:', error);
+      }
+    };
+
+    fetchRazorpayKey();
+  }, []);
 
   useEffect(() => {
     const getItems = async () => {
@@ -59,10 +75,9 @@ const CheckoutPage = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Simple client-side validation: Ensure all fields are filled
     if (
       !formData.firstName ||
       !formData.lastName ||
@@ -77,13 +92,73 @@ const CheckoutPage = () => {
       return;
     }
 
-    // Proceed with further actions (e.g., submit form data to backend)
-    console.log('Form submitted:', formData);
-    // Add logic here to submit formData to backend
-  };
+    const orderData = {
+      amount: formData.totalSum,
+      currency: 'INR',
+      receipt: `receipt_${Math.floor(Math.random() * 10000)}`
+    };
 
-  console.log(formData)
-  
+    try {
+      const res = await fetch('/api/payment/order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      const order = await res.json();
+      if (order.id) {
+        const options = {
+          key: razorpayKey,
+          amount: order.amount,
+          currency: order.currency,
+          name: 'jay Selection',
+          description: 'Test Transaction',
+          image: img, // Optional
+          order_id: order.id,
+          handler: async function (response) {
+            alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+
+            // Now pass the formData to /api/order/create
+            try {
+              const orderResponse = await fetch('/api/order/create', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+              });
+
+              const orderData = await orderResponse.json();
+
+              if (orderData.success) {
+                alert('Order created successfully!');
+                // You can redirect to a success page or clear the form
+              } else {
+                alert('Error creating order.');
+              }
+            } catch (error) {
+              console.error('Error creating order:', error);
+            }
+          },
+          prefill: {
+            name: `${formData.firstName} ${formData.lastName}`,
+            email: formData.email,
+            contact: formData.phoneNo
+          },
+          theme: {
+            color: '#3399cc'
+          }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      }
+    } catch (error) {
+      console.error('Error creating order:', error);
+    }
+  };
 
   return (
     <div className="font-sans bg-white">
@@ -131,10 +206,9 @@ const CheckoutPage = () => {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleInputChange}
-                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-blue-600"
+                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 border focus:border-yellow-400"
                   />
                 </div>
-
                 <div>
                   <input
                     type="text"
@@ -142,37 +216,35 @@ const CheckoutPage = () => {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
-                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-blue-600"
+                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 border focus:border-yellow-400"
                   />
                 </div>
-
                 <div>
                   <input
                     type="email"
-                    placeholder="Email"
+                    placeholder="Email Address"
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-blue-600"
+                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 border focus:border-yellow-400"
                   />
                 </div>
-
                 <div>
                   <input
-                    type="number"
-                    placeholder="Phone No."
+                    type="text"
+                    placeholder="Phone No"
                     name="phoneNo"
                     value={formData.phoneNo}
                     onChange={handleInputChange}
-                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-blue-600"
+                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 border focus:border-yellow-400"
                   />
                 </div>
               </div>
             </div>
 
             <div className="mt-8">
-              <h3 className="text-base text-gray-800 mb-4">Shipping Address</h3>
-              <div className="grid md:grid-cols-2 gap-4">
+              <h3 className="text-base text-gray-800 mb-4">Shipping Details</h3>
+              <div className="space-y-4">
                 <div>
                   <input
                     type="text"
@@ -180,45 +252,53 @@ const CheckoutPage = () => {
                     name="addressLine"
                     value={formData.addressLine}
                     onChange={handleInputChange}
-                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-blue-600"
+                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 border focus:border-yellow-400"
                   />
                 </div>
-                <div>
-                  <input
-                    type="text"
-                    placeholder="City"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-blue-600"
-                  />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="City"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                      className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 border focus:border-yellow-400"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="State"
+                      name="state"
+                      value={formData.state}
+                      onChange={handleInputChange}
+                      className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 border focus:border-yellow-400"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <input
-                    type="text"
-                    placeholder="State"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-blue-600"
-                  />
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Zip Code"
-                    name="zipCode"
-                    value={formData.zipCode}
-                    onChange={handleInputChange}
-                    className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-blue-600"
-                  />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Zip Code"
+                      name="zipCode"
+                      value={formData.zipCode}
+                      onChange={handleInputChange}
+                      className="px-4 py-3 bg-gray-100 focus:bg-transparent text-gray-800 w-full text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 border focus:border-yellow-400"
+                    />
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div className="flex gap-4 max-md:flex-col mt-8">
-                <button type="button" className="rounded-md px-6 py-3 w-full text-sm tracking-wide bg-transparent hover:bg-gray-100 border border-gray-300 text-gray-800 max-md:order-1">Cancel</button>
-                <button type="submit" className="rounded-md px-6 py-3 w-full text-sm tracking-wide bg-blue-600 hover:bg-blue-700 text-white">Complete Purchase</button>
-              </div>
+            <div className="mt-8">
+              <button
+                type="submit"
+                className="px-4 py-3 bg-yellow-400 text-white text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 border focus:border-yellow-400"
+              >
+                Pay Now
+              </button>
             </div>
           </form>
         </div>

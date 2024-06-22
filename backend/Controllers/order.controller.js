@@ -55,3 +55,27 @@ export const getOrders = async(req , res)=> {
         res.status(500).json({ success: false, message: error.message });
     }
 }
+
+export const getAllOrders = async(req , res)=>{
+
+    try{
+
+        const order = await Order.find();
+
+        if(!order)
+            {
+                res.state(404).json({
+                    success: false, message: 'Order not found'
+                })
+
+                return;
+            }
+            res.status(201).json(order);
+
+    }
+    catch (error) {
+     
+        res.status(500).json({ success: false, message: error.message });
+    }
+    
+}

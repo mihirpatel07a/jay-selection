@@ -17,6 +17,7 @@ import Pdetails from './pages/Pdetails'
 import Cart from './pages/Cart'
 import Checkout from './pages/CheckoutPage'
 import Order from './pages/Order'
+import AOrder from './Adminpages/AOrder'
 
 export default function App() {
   return (
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="/admin/updateitem/:id" element={<UpdateItem/>} ></Route>
         <Route path="/admin/users" element={<Users/>} ></Route>
         <Route path="/admin/home" element={<Ahome/>} ></Route>
+        <Route path="/admin/order" element={<AOrder/>} ></Route>
 
         
       </Routes>

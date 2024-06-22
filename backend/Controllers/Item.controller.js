@@ -159,6 +159,10 @@ export const updateItem = async (req, res, next) => {
 };
 
 
+
+
+
+
 export const getItem = async(req , res, next)=> {
 
     try{
@@ -231,10 +235,22 @@ export const createCartData = async (req, res) => {
     }
 };
 
+
 export const getCartData = async(req ,res)=>{
 
     try{
-        const data = await CartItem.find();
+        const data = await CartItem.find({ userid: req.params.id });
+
+        if(!data)
+            {
+                res.status(404).json({
+                    message : "data not found" , 
+                    success : false
+                })
+    
+                retrun 
+            }
+    
 
         res.status(200).json(data);
     }
@@ -247,4 +263,53 @@ export const getCartData = async(req ,res)=>{
     }
 }
 
+export const removeCartItem = async(req , res )=> {
+
+    try {
+        const item = await CartItem.findById(req.params.id);
+
+        if (!item) {
+            res.status(404).json({
+                message: "CartItem not found",
+                success: false
+            })
+
+            return
+
+        }
+        await CartItem.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({
+            success: true,
+            message: "successfully deleted"
+        })
+    }
+
+    catch (error) {
+        res.status(401).json({
+            success: false,
+            message: "something wrong"
+        });
+    }
+
+}
+
+export const  updateCart = async(req , res)=> {
+
+    const { cartProducts } = req.body;
+
+    try {
+      for (const product of cartProducts) {
+        await CartItem.updateOne(
+          { _id: product._id },
+          { $set: { quantity: product.quantity, totalprice: product.totalprice } }
+        );
+      }
+  
+      res.status(200).json({ success: true, message: 'Cart updated successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Failed to update cart' });
+    }
+}
 

@@ -1,81 +1,108 @@
 import { useEffect, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-
-
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { WindIcon } from 'lucide-react';
 
 export default function Cart() {
   const [open, setOpen] = useState(true);
   const [cartProducts, setCartProducts] = useState([]);
-  const [subtotal, setSubtotal] = useState(0);
+  const { currentUser } = useSelector((state) => state.user);
 
-  useEffect(()=>{
- 
-    const getitems = async()=> {
-        const res = await fetch('/api/item/getcartdata', {
-            method : "GET"
-        })
+  const navigate = useNavigate();
 
-        const data = await res.json();
+  useEffect(() => {
+    const getItems = async () => {
+      const res = await fetch(`/api/item/getcartdata/${currentUser.data._id}`, {
+        method: 'GET'
+      });
 
-        if(data.success === false)
-        {
-            console.log(data.message)
-            return; 
-        }
+      const data = await res.json();
 
-       
-        
-        setCartProducts(data);
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
 
-        const sum = data.data.reduce((acc, product) => acc + product.totalprice, 0);
-        setSubtotal(sum);
+      setCartProducts(data);
+    };
 
-    }
+    getItems();
+  }, [currentUser.data._id]);
 
-    getitems()
-    
-},[])
-
-
-
-  // Function to increment quantity
   const incrementQuantity = (productId) => {
     const updatedProducts = cartProducts.map((product) => {
-        if (product.id === productId ) {
-            const newQuantity = product.quantity + 1;
-            // Example: Increase price by 10% when quantity increases
-             // Adjust according to your logic
-          
-            const newPrice = product.totalprice + product.price ;
+      if (product.id === productId) {
+        const newQuantity = product.quantity + 1;
+        const newPrice = product.totalprice + product.price;
 
-            return { ...product, quantity: newQuantity, totalprice : newPrice };
-        }
-        return product;
+        return { ...product, quantity: newQuantity, totalprice: newPrice };
+      }
+      return product;
     });
     setCartProducts(updatedProducts);
-};
+  };
 
-
-   
-  // Function to decrement quantity
   const decrementQuantity = (productId) => {
     const updatedProducts = cartProducts.map((product) => {
-        if (product.id === productId && product.quantity > 1) {
-            const newQuantity = product.quantity - 1;
-            // Example: Decrease price by 10% when quantity decreases
-            const newPrice = product.totalprice - product.price;
+      if (product.id === productId && product.quantity > 1) {
+        const newQuantity = product.quantity - 1;
+        const newPrice = product.totalprice - product.price;
 
-            return { ...product, quantity: newQuantity, totalprice: newPrice };
-        }
-        return product;
+        return { ...product, quantity: newQuantity, totalprice: newPrice };
+      }
+      return product;
     });
     setCartProducts(updatedProducts);
-};
+  };
 
+  const handleRemove = async (id) => {
+    try {
+      const res = await fetch(`/api/item/deletecartitem/${id}`, {
+        method: 'DELETE'
+      });
 
+      const data = await res.json();
 
-  
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
 
+      alert('Successfully deleted');
+      window.location.reload();
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const res = await fetch('/api/item/updatecart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ cartProducts })
+      });
+
+      const data = await res.json();
+
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
+
+      alert('Successfully checked out');
+      navigate('/checkout'); // Navigate to the checkout page
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const calculateSubtotal = () => {
+    return cartProducts.reduce((sum, product) => sum + product.totalprice, 0);
+  };
 
   return (
     <div className={`fixed inset-0 overflow-y-auto ${open ? 'block' : 'hidden'}`}>
@@ -92,7 +119,7 @@ export default function Cart() {
             <button
               type="button"
               className="text-gray-400 hover:text-gray-500"
-              onClick={() => setOpen(false)}
+              onClick={() => { setOpen(false); navigate('/products'); }}
             >
               <span className="sr-only">Close panel</span>
               <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -144,6 +171,7 @@ export default function Cart() {
                       <button
                         type="button"
                         className="font-medium text-indigo-600 hover:text-indigo-500"
+                        onClick={() => handleRemove(product._id)}
                       >
                         Remove
                       </button>
@@ -157,23 +185,23 @@ export default function Cart() {
           <div className="px-6 py-4 bg-gray-100 border-t border-gray-200">
             <div className="flex justify-between text-base font-medium text-gray-900">
               <p>Subtotal</p>
-              <p>{subtotal}</p>
+              <p>{calculateSubtotal()}</p>
             </div>
             <p className="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
             <div className="mt-4 flex justify-center">
-              <a
-                href="#"
+              <button
                 className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 shadow-sm hover:bg-indigo-700"
+                onClick={handleCheckout}
               >
                 Checkout
-              </a>
+              </button>
             </div>
             <div className="mt-2 flex justify-center text-sm text-gray-500">
               <p>or</p>
               <button
                 type="button"
                 className="ml-1 font-medium text-indigo-600 hover:text-indigo-500"
-                onClick={() => setOpen(false)}
+                onClick={() => { setOpen(false); navigate('/products'); }}
               >
                 Continue Shopping
               </button>

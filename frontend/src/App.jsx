@@ -15,6 +15,7 @@ import Products from './pages/Products'
 import AllProducts from './pages/Allproducts'
 import Pdetails from './pages/Pdetails'
 import Cart from './pages/Cart'
+import Checkout from './pages/CheckoutPage'
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="/products" element={<AllProducts/>} ></Route>
         <Route path="/product/:id" element={<Pdetails/>} ></Route>
         <Route path="/cart" element={<Cart/>} ></Route>
+        <Route path="/checkout" element={<Checkout/>} ></Route>
 
 
 

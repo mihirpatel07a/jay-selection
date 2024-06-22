@@ -22,6 +22,34 @@ export default function Allproducts() {
   useEffect(() => {
 
     const urlParams = new URLSearchParams(location.search);
+    const searchTermFromUrl = urlParams.get("searchTerm");
+    const sizeFromUrl = urlParams.get("size");
+    const genderFromUrl = urlParams.get("gender");
+    const colorFromUrl = urlParams.get("color");
+    const categoryFromUrl = urlParams.get("category");
+    const sortFromUrl = urlParams.get("sort");
+    const orderFromUrl = urlParams.get("order");
+
+    if (
+      searchTermFromUrl ||
+      sizeFromUrl ||
+      genderFromUrl ||
+      colorFromUrl ||
+      categoryFromUrl ||
+      sortFromUrl ||
+      orderFromUrl
+    ) {
+      setFilters({
+        searchTerm: searchTermFromUrl || "",
+        sort: sortFromUrl  || "createdAt",
+        order :orderFromUrl || "desc",
+        category:categoryFromUrl || "",
+        size: sizeFromUrl || "",
+        gender: genderFromUrl || "male",
+        color: colorFromUrl || "black",
+      });
+    }
+
     const fetchItems = async () => {
       const searchQuery = urlParams.toString();
       const res = await fetch(`/api/item/getitems?${searchQuery}`);
@@ -54,6 +82,8 @@ export default function Allproducts() {
 
     const searchQuery = urlParams.toString();
     navigate(`/products?${searchQuery}`);
+
+
   };
 
   const handleChange = (e) => {

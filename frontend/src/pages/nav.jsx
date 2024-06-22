@@ -46,7 +46,7 @@ export default function Nav() {
               <a className="font-medium text-blue-500" href="/home" aria-current="page">Home</a>
               <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/products">Products</a>
               <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/cart">Cart</a>
-              <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="#">Blog</a>
+              <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/order">Orders</a>
 
               {currentUser ?
                 (

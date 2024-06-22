@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import img from '../assets/js.jpg';
+import { useNavigate } from 'react-router-dom';
 
 const CheckoutPage = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -18,6 +19,7 @@ const CheckoutPage = () => {
     cartItems: [],
     totalSum: 0
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRazorpayKey = async () => {
@@ -133,7 +135,7 @@ const CheckoutPage = () => {
               const orderData = await orderResponse.json();
 
               if (orderData.success) {
-                alert('Order created successfully!');
+                navigate('/order');
                 // You can redirect to a success page or clear the form
               } else {
                 alert('Error creating order.');

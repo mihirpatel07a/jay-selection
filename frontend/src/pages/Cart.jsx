@@ -93,7 +93,7 @@ export default function Cart() {
         return;
       }
 
-      alert('Successfully checked out');
+      
       navigate('/checkout'); // Navigate to the checkout page
     } catch (error) {
       console.log(error.message);

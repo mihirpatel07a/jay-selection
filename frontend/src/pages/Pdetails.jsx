@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { StarIcon } from "@heroicons/react/20/solid";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const product = {
@@ -16,6 +16,7 @@ const product = {
 
 const reviews = { href: "#", average: 4, totalCount: 117 };
 
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -24,6 +25,7 @@ export default function Pdetails() {
 
 
     const {currentUser} = useSelector((state) => state.user);
+    const navigate = useNavigate();
 
     
 
@@ -136,6 +138,7 @@ export default function Pdetails() {
         }
     
         alert("successfully added to cart");
+        navigate('/cart');
         
 
   };

@@ -38,7 +38,7 @@ const CheckoutPage = () => {
   useEffect(() => {
     const getItems = async () => {
       try {
-        const res = await fetch(`/api/item/getcartdata/${currentUser.data._id}`, {
+        const res = await fetch(`/api/item/getcartdata/${currentUser._id}`, {
           method: 'GET'
         });
 
@@ -64,10 +64,10 @@ const CheckoutPage = () => {
       }
     };
 
-    if (currentUser.data) {
+    
       getItems();
-    }
-  }, [currentUser.data]);
+    
+  }, [currentUser]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -124,6 +124,28 @@ const CheckoutPage = () => {
 
             // Now pass the formData to /api/order/create
             try {
+
+              const res = await fetch(`/api/item/deletecart/${currentUser._id}`, {
+                method : "DELETE"
+              })
+
+              const data = res.json();
+
+              if(data.success === false)
+                {
+                  console.log(data.message);
+                  alert("error on delete cart");
+                  return
+                }
+              
+
+             
+
+
+
+
+
+
               const orderResponse = await fetch('/api/order/create', {
                 method: 'POST',
                 headers: {
@@ -135,11 +157,15 @@ const CheckoutPage = () => {
               const orderData = await orderResponse.json();
 
               if (orderData.success) {
+                
                 navigate('/order');
+
                 // You can redirect to a success page or clear the form
               } else {
                 alert('Error creating order.');
               }
+
+             
             } catch (error) {
               console.error('Error creating order:', error);
             }

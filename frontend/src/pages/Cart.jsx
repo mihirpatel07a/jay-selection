@@ -13,7 +13,7 @@ export default function Cart() {
 
   useEffect(() => {
     const getItems = async () => {
-      const res = await fetch(`/api/item/getcartdata/${currentUser.data._id}`, {
+      const res = await fetch(`/api/item/getcartdata/${currentUser._id}`, {
         method: 'GET'
       });
 
@@ -28,7 +28,7 @@ export default function Cart() {
     };
 
     getItems();
-  }, [currentUser.data._id]);
+  }, [currentUser._id]);
 
   const incrementQuantity = (productId) => {
     const updatedProducts = cartProducts.map((product) => {

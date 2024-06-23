@@ -115,14 +115,7 @@ export default function Signin() {
                       {' '}
                       Password{' '}
                     </label>
-                    <a
-                      href="#"
-                      title=""
-                      className="text-sm font-semibold text-black hover:underline"
-                    >
-                      {' '}
-                      Forgot password?{' '}
-                    </a>
+                   
                   </div>
                   <div className="mt-2">
                     <input

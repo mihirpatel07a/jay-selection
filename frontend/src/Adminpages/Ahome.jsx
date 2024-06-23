@@ -3,6 +3,8 @@ import React from 'react'
  
 
 export default function Ahome() {
+
+
   return (
     <div className="relative overflow-hidden bg-white">
       <div className="pb-80 pt-16 sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">

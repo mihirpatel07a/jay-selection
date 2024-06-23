@@ -89,11 +89,7 @@ export const google = async (req, res) => {
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
             const { password , ...rest} = user._doc;
 
-            res.cookie("access_token", token, { httpOnly: true }).status(200).json({
-                success: true,
-                message: "successfully signed in",
-                data : rest
-            });
+            res.cookie("access_token", token, { httpOnly: true }).status(200).json( rest  );
         } else {
             // Generate a secure random password
             const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
@@ -111,11 +107,9 @@ export const google = async (req, res) => {
             const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
             const { password , ...rest} = newUser._doc;
 
-            res.cookie("access_token", token, { httpOnly: true }).status(200).json({
-                success: true,
-                message: "successfully signed in",
-                data : rest
-            });
+            res.cookie("access_token", token, { httpOnly: true }).status(200).json(
+     rest
+            );
         }
     } catch (error) {
         console.error(error);

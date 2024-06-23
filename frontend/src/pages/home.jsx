@@ -6,6 +6,7 @@ export default function Home() {
 
   const {currentUser} = useSelector((state)=> state.user);
 
+ 
   
   return (
     <div className="relative overflow-hidden bg-white">

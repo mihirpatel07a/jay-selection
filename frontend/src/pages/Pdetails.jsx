@@ -104,12 +104,21 @@ export default function Pdetails() {
 
     e.preventDefault();
     // Here you can add logic to add the selected item (with selected color and size) to the cart
-      const cartdata = {
+    
+    if(!currentUser)
+      {
+        alert("please signin first");
+        retrun;
+      }
+    
+    
+    
+    const cartdata = {
 
       
       id: id,
       name: item.title,
-      userid : currentUser.data._id,
+      userid : currentUser._id,
       color: selectedColor || item.color[0],
       size: selectedSize || item.size[0],
       price: item.price,

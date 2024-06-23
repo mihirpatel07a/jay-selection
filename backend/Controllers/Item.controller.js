@@ -313,6 +313,36 @@ export const  updateCart = async(req , res)=> {
       res.status(500).json({ success: false, message: 'Failed to update cart' });
     }
 }
+ // Assuming CartItem is your Mongoose model for cart items
+
+export const deleteCart = async (req, res) => {
+    try {
+        // Find all cart items by userid
+        const items = await CartItem.find({ userid: req.params.id });
+
+        if (!items || items.length === 0) {
+            return res.status(404).json({
+                message: "CartItems not found for the given userid",
+                success: false
+            });
+        }
+
+        // Delete all cart items
+        await CartItem.deleteMany({ userid: req.params.id });
+
+        return res.status(200).json({
+            success: true,
+            message: "Successfully deleted all cart items"
+        });
+    } catch (error) {
+        console.error("Error deleting cart items:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong"
+        });
+    }
+};
+
 
 // Ensure that the Order model is correctly imported
 

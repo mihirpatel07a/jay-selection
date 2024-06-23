@@ -20,9 +20,9 @@ export default function Profile() {
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
-    username: currentUser.data.username,
-    email: currentUser.data.email,
-    password: currentUser.data.password,
+    username: currentUser.username,
+    email: currentUser.email,
+    password: currentUser.password,
   });
 
   const handleChange = (e) => {
@@ -36,7 +36,7 @@ export default function Profile() {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      const res = await fetch(`/api/user/update/${currentUser.data._id}`, {
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export default function Profile() {
       
     try {
       dispatch(deleteUserStart());
-      const res = await fetch(`/api/user/delete/${currentUser.data._id}`, {
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
         method: "DELETE",
       });
 
@@ -123,7 +123,7 @@ export default function Profile() {
 
         <img
           className="rounded-full mt-4 h-[160px] w-[160px] object-cover mx-auto "
-          src={currentUser.data.avatar}
+          src={currentUser.avatar}
           alt="User Avatar"
         ></img>
 

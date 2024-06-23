@@ -7,7 +7,7 @@ export default function Order() {
 
   useEffect(() => {
     const getOrders = async () => {
-      const res = await fetch(`/api/order/getorders/${currentUser.data.email}`);
+      const res = await fetch(`/api/order/getorders/${currentUser.email}`);
 
       const data = await res.json();
 
@@ -20,8 +20,9 @@ export default function Order() {
     };
 
     getOrders();
-  }, [currentUser.data._id]);
+  }, [currentUser._id]);
 
+ 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);

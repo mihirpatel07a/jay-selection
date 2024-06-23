@@ -7,6 +7,7 @@ export default function Nav() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
 
+  
 
 
   const toggleNav = () => {
@@ -43,15 +44,33 @@ export default function Nav() {
           </div>
           <div className={`overflow-hidden transition-all duration-300 basis-full grow sm:block ${isNavOpen ? 'block' : 'hidden'}`}>
             <div className="flex flex-col gap-5 mt-5 sm:flex-row sm:items-center sm:justify-end sm:mt-0 sm:ps-5">
-              <a className="font-medium text-blue-500" href="/home" aria-current="page">Home</a>
-              <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/products">Products</a>
-              <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/cart">Cart</a>
-              <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/order">Orders</a>
 
+
+              {currentUser && currentUser.email === "admin1711@gmail.com" ? (
+<>
+
+
+<a className="font-medium text-blue-500" href="/home" aria-current="page">Home</a>
+<a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/admin/items">Products</a>
+<a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/admin/createitem">CreateItem</a>
+<a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/admin/order">Orders</a>
+</>
+
+              ) : (
+
+                <>
+               
+                <a className="font-medium text-blue-500" href="/home" aria-current="page">Home</a>
+                <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/products">Products</a>
+                <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/cart">Cart</a>
+                <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/order">Orders</a>
+                </>
+              )}
+           
               {currentUser ?
                 (
                   <Link to={'/profile'}>
-                    <img className='rounded-full w-10 h-10' src={currentUser.data.avatar} ></img>   </Link> ) :
+                    <img className='rounded-full w-10 h-10' src={currentUser.avatar} ></img>   </Link> ) :
 
                 (
                    <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/signin">Sign-in</a>

@@ -20,6 +20,7 @@ import Order from "./pages/Order";
 import AOrder from "./Adminpages/AOrder";
 import Privateprofile from "./pages/Privateprofile";
 import { useSelector } from "react-redux";
+import Aboutus from "./pages/Aboutus";
 
 export default function App() {
   const { currentUser } = useSelector((state) => state.user);
@@ -53,6 +54,7 @@ export default function App() {
               <Route path="/signup" element={<Signup />}></Route>
 
               <Route path="/products" element={<AllProducts />}></Route>
+              <Route path="/aboutus" element={<Aboutus />}></Route>
               <Route path="/product/:id" element={<Pdetails />}></Route>
 
               <Route element={<Privateprofile />}>

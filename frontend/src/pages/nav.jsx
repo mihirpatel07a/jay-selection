@@ -21,7 +21,7 @@ export default function Nav() {
           <div className="flex items-center justify-between">
             <a className="inline-flex items-center w-[200px] gap-x-2 text-xl font-semibold dark:text-white" href="#">
               <img className="w-10 h-auto mr-2" src={img} alt="Logo" />
-              Jay Selection
+              JAY SElECTION
             </a>
             <div className="sm:hidden">
               <button type="button" className="p-2 inline-flex justify-center items-center gap-x-2 rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-transparent dark:border-neutral-700 dark:text-white dark:hover:bg-white/10" onClick={toggleNav} aria-label="Toggle navigation">
@@ -64,6 +64,7 @@ export default function Nav() {
                 <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/products">Products</a>
                 <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/cart">Cart</a>
                 <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/order">Orders</a>
+                <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500" href="/aboutus">AboutUS</a>
                 </>
               )}
            

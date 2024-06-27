@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
 import itemRouter from "./routes/items.route.js";
+import queryRouter from "./routes/query.route.js";
 import Razorpay from "razorpay";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -42,6 +43,7 @@ app.use('/api/user' , userRouter);
 app.use('/api/auth' , authRouter);
 app.use('/api/item' , itemRouter);
 app.use('/api/order' , orderRouter);
+app.use('/api/query' , queryRouter);
 
 app.get('/api/payment/key', (req, res) => {
   res.send({ key: process.env.REACT_APP_RAZORPAY_KEY_ID });

@@ -2,6 +2,7 @@ import React, { useState , useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import Products from "./Products.jsx";
 import EcommerceCard from "../Adminpages/Ecommercecard.jsx";
+import Footer from "./Footer.jsx";
 
 export default function Allproducts() {
   const [filters, setFilters] = useState({
@@ -115,6 +116,7 @@ export default function Allproducts() {
   
 
   return (
+    <>
     <div className="flex flex-col md:flex-row">
       <div className="p-7 border-b-2 md:border-r-2 md:min-h-screen">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -233,5 +235,7 @@ export default function Allproducts() {
       
       </div>
     </div>
+    <Footer/>
+    </>
   );
 }

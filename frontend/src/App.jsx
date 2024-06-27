@@ -21,6 +21,8 @@ import AOrder from "./Adminpages/AOrder";
 import Privateprofile from "./pages/Privateprofile";
 import { useSelector } from "react-redux";
 import Aboutus from "./pages/Aboutus";
+import Query from "./Adminpages/Query";
+import Contactus from "./pages/Contactus";
 
 export default function App() {
   const { currentUser } = useSelector((state) => state.user);
@@ -44,6 +46,8 @@ export default function App() {
               <Route path="/admin/order" element={<AOrder />}></Route>
               <Route path="/*" element={<PagenotFound />}></Route>
               <Route path="/profile" element={<Profile />}></Route>
+              <Route path="/admin/query" element={<Query/>}></Route>
+
             </>
           ) : (
             <>
@@ -55,6 +59,7 @@ export default function App() {
 
               <Route path="/products" element={<AllProducts />}></Route>
               <Route path="/aboutus" element={<Aboutus />}></Route>
+              <Route path="/contactus" element={<Contactus/>}></Route>
               <Route path="/product/:id" element={<Pdetails />}></Route>
 
               <Route element={<Privateprofile />}>

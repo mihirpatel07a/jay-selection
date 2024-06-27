@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import Footer from "./Footer";
 
 export default function Order() {
   const { currentUser } = useSelector((state) => state.user);
@@ -29,7 +30,8 @@ export default function Order() {
   };
 
   return (
-    <div className="relative overflow-x-auto shadow-md sm:rounded-lg flex  justify-center">
+    <>
+    <div className="relative overflow-x-auto shadow-md sm:rounded-lg flex mb-8 justify-center">
       <table className="w-full sm:max-w-4xl md:max-w-2xl text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 p-3 mt-5">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
@@ -100,5 +102,7 @@ export default function Order() {
         </tbody>
       </table>
     </div>
+    <Footer/>
+    </>
   );
 }
